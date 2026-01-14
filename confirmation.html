@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tracking Your Order | Chohan’s Food Club</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-2xl w-full">
+        <div class="text-center mb-10">
+            <h1 class="kfc-font text-5xl italic uppercase text-red-600">Track Your Meal</h1>
+            <p class="text-gray-500 font-bold mt-2">Order ID: <span id="display-order-id" class="text-black"></span></p>
+        </div>
+
+        <div class="relative mb-12">
+            <div class="absolute top-1/2 left-0 w-full h-1 bg-gray-200 -translate-y-1/2 z-0"></div>
+            <div id="progress-bar" class="absolute top-1/2 left-0 w-0 h-1 bg-red-600 -translate-y-1/2 z-10 transition-all duration-1000"></div>
+
+            <div class="flex justify-between relative z-20">
+                <div class="step-item active" id="step-1">
+                    <div class="step-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <span class="step-label">Confirmed</span>
+                </div>
+                <div class="step-item" id="step-2">
+                    <div class="step-icon"><i class="fas fa-fire"></i></div>
+                    <span class="step-label">Cooking</span>
+                </div>
+                <div class="step-item" id="step-3">
+                    <div class="step-icon"><i class="fas fa-motorcycle"></i></div>
+                    <span class="step-label">On the Way</span>
+                </div>
+                <div class="step-item" id="step-4">
+                    <div class="step-icon"><i class="fas fa-home"></i></div>
+                    <span class="step-label">Arrived</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-red-50 border-l-4 border-red-600 p-4 mb-8 text-center">
+            <p id="status-text" class="font-bold text-red-700 text-lg italic">We've received your order!</p>
+        </div>
+
+     <div class="bg-gray-50 p-6 rounded-2xl border border-dashed border-gray-300">
+    <h3 class="font-bold uppercase text-xs text-gray-400 mb-4 tracking-widest">Delivering To</h3>
+    <div class="flex items-start gap-4">
+        <div class="bg-red-600 text-white p-3 rounded-full">
+            <i class="fas fa-map-marker-alt"></i>
+        </div>
+        <div>
+            <p id="display-cust-name" class="font-bold text-lg text-black">Guest Customer</p>
+            <p id="display-cust-address" class="text-gray-500 text-sm italic leading-tight mt-1">
+                No address provided.
+            </p>
+        </div>
+    </div>
+</div>
+<div class="mt-6 border-t pt-6">
+    <h3 class="font-bold uppercase text-xs text-gray-400 mb-4 tracking-widest">Your Bucket Items</h3>
+    <div id="tracker-items-list" class="space-y-3">
+        </div>
+    
+    <div class="flex justify-between items-center mt-6 pt-4 border-t border-dashed">
+        <span class="font-bold text-gray-400 uppercase text-xs">Total Paid</span>
+        <span id="tracker-total-bill" class="text-xl font-black text-red-600">Rs. 0</span>
+    </div>
+</div>
+        <div class="text-center">
+            <a href="index.html" class="text-gray-400 hover:text-red-600 font-bold uppercase text-xs tracking-tighter transition">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Home
+            </a>
+        </div>
+    </div>
+
+    <script>
+function syncTracker() {
+    const lastOrderData = localStorage.getItem('lastOrder');
+    if(!lastOrderData) return;
+
+    const lastOrder = JSON.parse(lastOrderData);
+
+    // 1. FILL CUSTOMER DETAILS
+    if(document.getElementById('display-cust-name')) {
+        document.getElementById('display-cust-name').innerText = lastOrder.customer.name;
+    }
+    if(document.getElementById('display-cust-address')) {
+        document.getElementById('display-cust-address').innerText = lastOrder.customer.address;
+    }
+
+    // 2. FILL ORDER ITEMS (The Fix)
+    const itemsContainer = document.getElementById('tracker-items-list');
+    
+    // Check if the container is empty before rendering
+    if(itemsContainer && itemsContainer.children.length === 0) { 
+        if(lastOrder.items && lastOrder.items.length > 0) {
+            itemsContainer.innerHTML = lastOrder.items.map(item => `
+                <div class="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm border border-gray-100 mb-2">
+                    <div class="flex items-center gap-3">
+                        <img src="${item.img}" class="w-10 h-10 object-cover rounded-lg border">
+                        <span class="font-bold text-sm text-black">${item.name}</span>
+                    </div>
+                    <span class="text-xs font-bold text-gray-500 font-mono">Rs. ${item.price}</span>
+                </div>
+            `).join('');
+            
+            if(document.getElementById('tracker-total-bill')) {
+                document.getElementById('tracker-total-bill').innerText = `Rs. ${lastOrder.total}`;
+            }
+        }
+    }
+
+    // 3. SYNC STATUS WITH ADMIN
+    const allOrders = JSON.parse(localStorage.getItem('allOrders')) || [];
+    const myOrder = allOrders.find(o => o.id === lastOrder.id);
+
+    if (myOrder) {
+        updateTrackerUI(myOrder.status); // This moves the progress bar
+    }
+}
+// Call syncTracker when the page opens
+window.onload = () => {
+    syncTracker();
+    setInterval(syncTracker, 2000); // Keep checking for Admin updates
+};
+function updateTrackerUI(status) {
+    const progressBar = document.getElementById('progress-bar');
+    const statusText = document.getElementById('status-text');
+    
+    // Reset all steps
+    document.querySelectorAll('.step-item').forEach(el => el.classList.remove('active'));
+
+    // Update based on Admin selection
+    if (status === 'Pending') {
+        progressBar.style.width = '0%';
+        statusText.innerText = "We've received your order!";
+        document.getElementById('step-1').classList.add('active');
+    } 
+    else if (status === 'Cooking') {
+        progressBar.style.width = '33%';
+        statusText.innerText = "The Chef is preparing your bucket...";
+        document.getElementById('step-1').classList.add('active');
+        document.getElementById('step-2').classList.add('active');
+    } 
+    else if (status === 'On the Way') {
+        progressBar.style.width = '66%';
+        statusText.innerText = "Rider has picked up your food!";
+        document.getElementById('step-1').classList.add('active');
+        document.getElementById('step-2').classList.add('active');
+        document.getElementById('step-3').classList.add('active');
+    } 
+    else if (status === 'Completed') {
+        progressBar.style.width = '100%';
+        statusText.innerText = "Order Delivered! Enjoy your meal.";
+        document.querySelectorAll('.step-item').forEach(el => el.classList.add('active'));
+    }
+}
+
+// 3. Set up the Polling (Check for updates every 2 seconds)
+window.onload = () => {
+    syncTracker(); // Initial check
+    setInterval(syncTracker, 2000); 
+};
+    </script>
+</body>
+</html>
