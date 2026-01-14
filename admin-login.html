@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Login | Chohan’s Food Club</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-black flex items-center justify-center min-h-screen">
+    <div class="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-md">
+        <div class="text-center mb-8">
+            <h1 class="kfc-font text-4xl">ADMIN <span class="text-black">ACCESS</span></h1>
+            <p class="text-gray-500 text-sm">Chohan's Food Club Management</p>
+        </div>
+        
+        <form id="admin-login-form" class="space-y-4">
+            <input type="email" id="adminEmail" placeholder="Email Address" class="w-full p-4 border rounded-xl" required>
+            <input type="password" id="adminPass" placeholder="Password" class="w-full p-4 border rounded-xl" required>
+            <button type="submit" class="w-full bg-red-600 text-white py-4 rounded-xl font-bold uppercase hover:bg-red-700 transition">
+                Login to Dashboard
+            </button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('admin-login-form').onsubmit = (e) => {
+            e.preventDefault();
+            const email = document.getElementById('adminEmail').value;
+            const pass = document.getElementById('adminPass').value;
+
+            if(email === 'admin@chohan.com' && pass === 'admin123') {
+                sessionStorage.setItem('isAdminLoggedIn', 'true');
+                window.location.href = 'admin-dashboard.html';
+            } else {
+                alert('Invalid Credentials!');
+            }
+        }
+    </script>
+</body>
+</html>
