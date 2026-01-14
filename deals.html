@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Special Deals | Chohan’s Food Club</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+
+    <nav class="nav-container sticky top-0 bg-white z-50 shadow-sm px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-10">
+                <div class="brand-logo kfc-font">
+                    CHOHAN’S <br><span class="text-black">FOOD CLUB</span>
+                </div>
+                <div class="hidden lg:flex gap-6 uppercase font-bold text-sm tracking-tighter">
+                    <a href="index.html" class="hover:text-red-600">Our Menu</a>
+                    <a href="deals.html" class="text-red-600 border-b-2 border-red-600">Special Deals</a>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleCart()" class="cart-btn bg-red-600 text-white px-6 py-2 rounded-full font-bold flex items-center gap-2">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="cart-count">0</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto py-12 px-6">
+        <h1 class="kfc-font text-5xl mb-10 italic uppercase text-center">Exclusive <span class="text-black">Deals</span></h1>
+        
+        <div id="deals-grid" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row border-4 border-red-600">
+                <div class="md:w-1/2 bg-black p-6 flex items-center justify-center">
+                    <img src="https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=400" class="hover:scale-110 transition duration-500">
+                </div>
+                <div class="p-8 md:w-1/2">
+                    <h3 class="text-2xl font-black uppercase italic">Chohan Party Box</h3>
+                    <p class="text-gray-500 my-4 text-xs">2 Zingers, 2 Pcs Chicken, 1 Fries, 2 Drinks.</p>
+                    <p class="text-3xl font-black text-red-600 mb-6">Rs. 1499</p>
+                    <button onclick="addDealToCart(101, 'Chohan Party Box', 1499, 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=400')" 
+                            class="w-full bg-red-600 text-white py-3 rounded-full font-bold uppercase hover:bg-black transition">
+                        Add to Bucket
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row border-4 border-black">
+                <div class="md:w-1/2 bg-red-600 p-6 flex items-center justify-center">
+                    <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400" class="hover:scale-110 transition duration-500">
+                </div>
+                <div class="p-8 md:w-1/2">
+                    <h3 class="text-2xl font-black uppercase italic">Duo Saver</h3>
+                    <p class="text-gray-500 my-4 text-xs">Any 2 Burgers with 1 Large Pepsi.</p>
+                    <p class="text-3xl font-black text-black mb-6">Rs. 990</p>
+                    <button onclick="addDealToCart(102, 'Duo Saver', 990, 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400')" 
+                            class="w-full bg-black text-white py-3 rounded-full font-bold uppercase hover:bg-red-600 transition">
+                        Add to Bucket
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   <div id="cart-sidebar" class="fixed right-0 top-0 h-screen w-full md:w-[400px] bg-white z-[100] translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
+    
+    <div class="p-6 border-b flex justify-between items-center bg-red-600 text-white">
+        <h2 class="kfc-font text-2xl uppercase italic">Your Bucket</h2>
+        <button onclick="toggleCart()" class="text-3xl">&times;</button>
+    </div>
+
+    <div id="cart-items-container" class="flex-grow overflow-y-auto p-6 space-y-4">
+        </div>
+
+    <div class="p-6 border-t bg-gray-50">
+        <div class="flex justify-between text-2xl font-bold mb-4">
+            <span>Total:</span>
+            <span>Rs. <span id="cart-total-price">0</span></span>
+        </div>
+        <button onclick="proceedToCheckout()" class="w-full bg-red-600 text-white py-4 rounded-lg font-bold uppercase hover:bg-red-700 transition">
+            Proceed to Checkout
+        </button>
+    </div>
+</div>
+
+    <script src="script.js"></script>
+    <script>
+        // Custom function for the Deals page to handle hardcoded deal data
+     function addDealToCart(id, name, price, img) {
+    const dealItem = { id, name, price, img };
+    cart.push(dealItem); // This 'cart' must be the one from script.js
+    saveCart();
+    updateCartUI();
+    
+    // Open the sidebar
+    const drawer = document.getElementById('cart-sidebar');
+    if (drawer) drawer.classList.remove('translate-x-full');
+}
+    </script>
+</body>
+</html>
