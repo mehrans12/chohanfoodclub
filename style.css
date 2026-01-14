@@ -1,0 +1,117 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Poppins:wght@400;700&display=swap');
+
+:root {
+    --kfc-red: #E4002B;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+.kfc-font {
+    font-family: 'Oswald', sans-serif;
+    color: var(--kfc-red);
+    line-height: 0.9;
+}
+
+.brand-logo {
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: -2px;
+}
+
+.hero-section {
+    background-color: #000;
+    min-height: 500px;
+    background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://www.transparenttextures.com/patterns/dark-leather.png');
+}
+
+.hero-img {
+    filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5));
+    transform: rotate(-5deg);
+}
+
+.cat-pill {
+    padding: 8px 24px;
+    border-radius: 99px;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    border: 1px solid #ddd;
+    transition: all 0.2s;
+}
+
+.cat-pill.active {
+    background-color: var(--kfc-red);
+    color: white;
+    border-color: var(--kfc-red);
+}
+
+.food-card {
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.food-card:hover {
+    transform: translateY(-10px);
+}
+/* Live Tracker Styles */
+.step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80px;
+    text-align: center;
+}
+
+.step-icon {
+    width: 45px;
+    height: 45px;
+    background: white;
+    border: 3px solid #e5e7eb; /* Gray-200 */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af; /* Gray-400 */
+    font-size: 1.2rem;
+    transition: all 0.4s ease;
+    margin-bottom: 8px;
+}
+
+.step-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #9ca3af;
+    letter-spacing: 0.5px;
+}
+
+/* Active State */
+.step-item.active .step-icon {
+    border-color: #E4002B; /* KFC Red */
+    color: #E4002B;
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(228, 0, 43, 0.3);
+}
+
+.step-item.active .step-label {
+    color: #000;
+}
+
+/* Pulse Animation for Current Step */
+.step-item.active:last-of-type .step-icon {
+    animation: pulseRed 2s infinite;
+}
+
+@keyframes pulseRed {
+    0% { box-shadow: 0 0 0 0 rgba(228, 0, 43, 0.4); }
+    70% { box-shadow: 0 0 0 15px rgba(228, 0, 43, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(228, 0, 43, 0); }
+}
+.food-card img {
+    transition: transform 0.5s ease;
+}
+
+.food-card:hover img {
+    transform: scale(1.1); /* This creates that premium 'food-first' feel */
+}
