@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Checkout | Chohan’s Food Club</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-white p-4 shadow-sm text-center">
+        <h1 class="kfc-font text-3xl">CHOHAN’S <span class="text-black">FOOD CLUB</span></h1>
+    </nav>
+
+    <div class="max-w-4xl mx-auto py-10 px-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="bg-white p-8 rounded-xl shadow-sm">
+            <h2 class="text-2xl font-bold mb-6 border-b pb-2">Delivery Details</h2>
+            <form id="checkout-form" class="space-y-4">
+                <input type="text" id="custName" placeholder="Full Name" class="w-full p-3 border rounded-lg focus:outline-red-600" required>
+                <input type="tel" id="custPhone" placeholder="Phone Number (e.g. 0300...)" class="w-full p-3 border rounded-lg" required>
+                <input type="email" id="custEmail" placeholder="Email Address" class="w-full p-3 border rounded-lg" required>
+                <textarea id="custAddress" placeholder="Full Delivery Address" class="w-full p-3 border rounded-lg h-32" required></textarea>
+                
+                <h3 class="font-bold mt-4">Payment Method</h3>
+                <div class="flex gap-4">
+                    <label class="flex-1 border p-3 rounded-lg flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="payment" value="COD" checked> Cash on Delivery
+                    </label>
+                </div>
+                
+                <button type="submit" class="w-full bg-red-600 text-white py-4 rounded-lg font-bold uppercase mt-6">
+                    Place My Order
+                </button>
+            </form>
+        </div>
+
+        <div class="bg-white p-8 rounded-xl shadow-sm h-fit">
+            <h2 class="text-2xl font-bold mb-6 border-b pb-2">Order Summary</h2>
+            <div id="summary-items" class="space-y-3 mb-6">
+                </div>
+            <div class="border-t pt-4 space-y-2">
+                <div class="flex justify-between"><span>Subtotal</span><span id="subtotal">Rs. 0</span></div>
+                <div class="flex justify-between text-green-600"><span>Delivery Fee</span><span>FREE</span></div>
+                <div class="flex justify-between text-2xl font-bold pt-4 border-t">
+                    <span>Total</span><span id="final-total">Rs. 0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Specific logic for checkout page
+        window.onload = () => {
+            displaySummary();
+            document.getElementById('checkout-form').onsubmit = handleOrder;
+        };
+    </script>
+</body>
+</html>
