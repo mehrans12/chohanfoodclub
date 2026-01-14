@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Chohan’s Food Club</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap');
+        .kfc-font { font-family: 'Oswald', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <div class="w-full md:w-64 bg-black text-white p-6 shadow-xl">
+            <h1 class="kfc-font text-3xl mb-10 text-red-600 text-center uppercase">Admin <span class="text-white">Panel</span></h1>
+            <nav class="space-y-4">
+                <button onclick="switchTab('orders')" id="btn-orders" class="w-full text-left p-3 bg-red-600 rounded-lg font-bold transition">
+                    <i class="fas fa-box mr-2"></i> Orders
+                </button>
+                <button onclick="switchTab('menu')" id="btn-menu" class="w-full text-left p-3 hover:bg-gray-800 rounded-lg font-bold transition">
+                    <i class="fas fa-utensils mr-2"></i> Manage Menu
+                </button>
+                <button onclick="logout()" class="w-full text-left p-3 hover:bg-red-900 rounded-lg text-gray-400 mt-10 transition">
+                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                </button>
+            </nav>
+        </div>
+
+        <main class="flex-grow p-4 md:p-8">
+            
+            <div id="tab-orders">
+                <header class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-black uppercase italic">Customer <span class="text-red-600">Orders</span></h2>
+                    <div class="bg-white px-6 py-3 rounded-2xl shadow-sm border border-red-100 text-right">
+                        <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">Total Revenue</p>
+                        <p class="text-2xl font-black text-red-600" id="total-sales">Rs. 0</p>
+                    </div>
+                </header>
+
+                <div class="bg-white rounded-2xl shadow-md border overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-gray-100 border-b">
+                            <tr>
+                                <th class="p-4 text-[10px] font-bold text-gray-500 uppercase">Order ID</th>
+                                <th class="p-4 text-[10px] font-bold text-gray-500 uppercase">Customer</th>
+                                <th class="p-4 text-[10px] font-bold text-gray-500 uppercase">Address</th>
+                                <th class="p-4 text-[10px] font-bold text-gray-500 uppercase">Items Detail</th>
+                                <th class="p-4 text-[10px] font-bold text-gray-500 uppercase">Bill</th>
+                                <th class="p-4 text-[10px] font-bold text-gray-500 uppercase">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-menu" class="hidden">
+                <header class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-black uppercase italic">Manage <span class="text-red-600">Menu</span></h2>
+                    <button onclick="openMenuModal()" class="bg-red-600 text-white px-6 py-3 rounded-full font-bold uppercase text-xs shadow-lg hover:bg-red-700 transition">
+                        <i class="fas fa-plus mr-2"></i> Add Item
+                    </button>
+                </header>
+
+                <div class="bg-white rounded-2xl shadow-md border overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-100 border-b">
+                            <tr>
+                                <th class="p-4 text-[10px] font-bold text-gray-500 uppercase">Img</th>
+                                <th class="p-4 text-[10px] font-bold text-gray-500 uppercase">Product Name</th>
+                                <th class="p-4 text-[10px] font-bold text-gray-500 uppercase">Category</th>
+                                <th class="p-4 text-[10px] font-bold text-gray-500 uppercase">Price</th>
+                                <th class="p-4 text-[10px] font-bold text-gray-500 uppercase">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="menu-management-tbody"> </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="menu-modal" class="fixed inset-0 bg-black/60 hidden z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
+            <h3 id="modal-title" class="kfc-font text-3xl mb-6 uppercase italic tracking-tighter">Add Menu <span class="text-red-600">Item</span></h3>
+            <form id="menu-form" class="space-y-4">
+                <input type="hidden" id="edit-id">
+                <input type="text" id="menu-name" placeholder="Item Name" class="w-full p-3 border rounded-xl outline-red-600" required>
+                <select id="menu-category" class="w-full p-3 border rounded-xl outline-red-600" required>
+                    <option value="buckets">Buckets</option>
+                    <option value="burgers">Burgers</option>
+                    <option value="snacks">Snacks</option>
+                    <option value="drinks">Drinks</option>
+                </select>
+                <input type="number" id="menu-price" placeholder="Price (PKR)" class="w-full p-3 border rounded-xl outline-red-600" required>
+                <input type="text" id="menu-img" placeholder="Image URL" class="w-full p-3 border rounded-xl outline-red-600" required>
+                <div class="flex gap-4 mt-8">
+                    <button type="button" onclick="closeMenuModal()" class="flex-1 py-3 border-2 border-gray-200 rounded-xl font-bold uppercase text-xs">Cancel</button>
+                    <button type="submit" class="flex-1 py-3 bg-red-600 text-white rounded-xl font-bold uppercase text-xs hover:bg-red-700 shadow-lg">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Security Check
+        if(sessionStorage.getItem('isAdminLoggedIn') !== 'true') {
+            window.location.href = 'admin-login.html';
+        }
+
+        // --- TAB SWITCHING ---
+        function switchTab(tab) {
+            document.getElementById('tab-orders').classList.toggle('hidden', tab !== 'orders');
+            document.getElementById('tab-menu').classList.toggle('hidden', tab !== 'menu');
+            document.getElementById('btn-orders').classList.toggle('bg-red-600', tab === 'orders');
+            document.getElementById('btn-menu').classList.toggle('bg-red-600', tab === 'menu');
+            if(tab === 'menu') renderMenuManagement();
+            if(tab === 'orders') renderOrders();
+        }
+
+        // --- ORDER MANAGEMENT FUNCTIONS ---
+        function renderOrders() {
+            const orders = JSON.parse(localStorage.getItem('allOrders')) || [];
+            const tbody = document.getElementById('orders-tbody');
+            let totalSales = 0;
+
+            tbody.innerHTML = orders.slice().reverse().map((order, reversedIdx) => {
+                const actualIdx = orders.length - 1 - reversedIdx;
+                totalSales += order.total;
+                const itemsList = order.items.map(i => i.name).join(', ');
+                
+                return `
+                    <tr class="border-b hover:bg-gray-50 transition ${order.status === 'Completed' ? 'bg-green-50' : ''}">
+                        <td class="p-4 font-mono text-[11px] text-gray-400">${order.id}</td>
+                        <td class="p-4">
+                            <p class="font-bold text-sm">${order.customer.name}</p>
+                            <p class="text-[10px] text-gray-500">${order.customer.phone}</p>
+                        </td>
+                        <td class="p-4 text-xs text-gray-600 max-w-[150px] truncate" title="${order.customer.address}">${order.customer.address}</td>
+                        <td class="p-4 text-xs italic text-gray-700">${itemsList}</td>
+                        <td class="p-4 font-bold text-red-600">Rs. ${order.total}</td>
+                        <td class="p-4">
+                            <div class="flex items-center gap-2">
+                                <select onchange="updateOrderStatus('${order.id}', this.value)" 
+                                        class="border rounded p-1 text-[10px] font-bold outline-none cursor-pointer">
+                                    <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                    <option value="Cooking" ${order.status === 'Cooking' ? 'selected' : ''}>Cooking</option>
+                                    <option value="On the Way" ${order.status === 'On the Way' ? 'selected' : ''}>Out for Delivery</option>
+                                    <option value="Completed" ${order.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                                </select>
+                                <button onclick="downloadReceipt('${order.id}')" class="text-blue-500 hover:text-blue-700" title="Print Receipt">
+                                    <i class="fas fa-print"></i>
+                                </button>
+                                <button onclick="deleteOrder(${actualIdx})" class="text-gray-300 hover:text-red-600">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            document.getElementById('total-sales').innerText = `Rs. ${totalSales}`;
+        }
+
+        function updateOrderStatus(orderId, newStatus) {
+            let allOrders = JSON.parse(localStorage.getItem('allOrders')) || [];
+            const index = allOrders.findIndex(o => o.id === orderId);
+            if (index !== -1) {
+                allOrders[index].status = newStatus;
+                localStorage.setItem('allOrders', JSON.stringify(allOrders));
+                renderOrders();
+            }
+        }
+
+        function deleteOrder(index) {
+            if(confirm("Confirm to delete this order record?")) {
+                let allOrders = JSON.parse(localStorage.getItem('allOrders')) || [];
+                allOrders.splice(index, 1);
+                localStorage.setItem('allOrders', JSON.stringify(allOrders));
+                renderOrders();
+            }
+        }
+
+        // --- MENU MANAGEMENT FUNCTIONS ---
+        function renderMenuManagement() {
+            const tbody = document.getElementById('menu-management-tbody');
+            tbody.innerHTML = menuItems.map((item) => `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="p-4"><img src="${item.img}" class="w-10 h-10 rounded-lg object-cover border"></td>
+                    <td class="p-4 font-bold text-sm">${item.name}</td>
+                    <td class="p-4 text-[10px] uppercase font-bold text-gray-400 tracking-widest">${item.category}</td>
+                    <td class="p-4 font-bold text-red-600">Rs. ${item.price}</td>
+                    <td class="p-4">
+                        <button onclick="editMenuItem(${item.id})" class="text-blue-500 hover:text-blue-700 mr-3"><i class="fas fa-edit"></i></button>
+                        <button onclick="deleteMenuItem(${item.id})" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        document.getElementById('menu-form').onsubmit = (e) => {
+            e.preventDefault();
+            const id = document.getElementById('edit-id').value;
+            const newItem = {
+                id: id ? parseInt(id) : Date.now(),
+                name: document.getElementById('menu-name').value,
+                category: document.getElementById('menu-category').value,
+                price: parseInt(document.getElementById('menu-price').value),
+                img: document.getElementById('menu-img').value
+            };
+            if (id) {
+                const idx = menuItems.findIndex(i => i.id == id);
+                menuItems[idx] = newItem;
+            } else {
+                menuItems.push(newItem);
+            }
+            saveMenu();
+            renderMenuManagement();
+            closeMenuModal();
+        };
+
+        function deleteMenuItem(id) {
+            if(confirm("Permanently remove this item from the live menu?")) {
+                menuItems = menuItems.filter(i => i.id !== id);
+                saveMenu();
+                renderMenuManagement();
+            }
+        }
+
+        function openMenuModal() {
+            document.getElementById('menu-form').reset();
+            document.getElementById('edit-id').value = '';
+            document.getElementById('modal-title').innerHTML = "Add Menu <span class='text-red-600'>Item</span>";
+            document.getElementById('menu-modal').classList.remove('hidden');
+        }
+
+        function closeMenuModal() { document.getElementById('menu-modal').classList.add('hidden'); }
+
+        function editMenuItem(id) {
+            const item = menuItems.find(i => i.id == id);
+            document.getElementById('edit-id').value = item.id;
+            document.getElementById('menu-name').value = item.name;
+            document.getElementById('menu-category').value = item.category;
+            document.getElementById('menu-price').value = item.price;
+            document.getElementById('menu-img').value = item.img;
+            document.getElementById('modal-title').innerHTML = "Edit Menu <span class='text-red-600'>Item</span>";
+            document.getElementById('menu-modal').classList.remove('hidden');
+        }
+
+        function saveMenu() {
+            localStorage.setItem('chohanMenuItems', JSON.stringify(menuItems));
+        }
+
+        // --- RECEIPT PDF GENERATION ---
+        function downloadReceipt(orderId) {
+            const orders = JSON.parse(localStorage.getItem('allOrders')) || [];
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFontSize(22);
+            doc.setTextColor(228, 0, 43);
+            doc.text("CHOHAN'S FOOD CLUB", 105, 20, { align: "center" });
+            doc.setFontSize(10); doc.setTextColor(100); doc.text("OFFICIAL RECEIPT", 105, 28, { align: "center" });
+            doc.setTextColor(0); doc.setFontSize(12);
+            doc.text(`Order ID: ${order.id}`, 14, 45);
+            doc.text(`Customer: ${order.customer.name}`, 14, 52);
+            doc.text(`Phone: ${order.customer.phone}`, 14, 59);
+            doc.text(`Address: ${order.customer.address}`, 14, 66);
+            const tableData = order.items.map(item => [item.name, `Rs. ${item.price}`]);
+            doc.autoTable({ startY: 75, head: [['Item', 'Price']], body: tableData, theme: 'grid', headStyles: { fillColor: [228, 0, 43] } });
+            doc.setFontSize(16); doc.text(`Total: Rs. ${order.total}`, 196, doc.lastAutoTable.finalY + 15, { align: "right" });
+            doc.save(`Receipt_${order.id}.pdf`);
+        }
+
+        function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
+
+        // Initialize
+        window.onload = () => { renderOrders(); };
+    </script>
+</body>
+</html>
